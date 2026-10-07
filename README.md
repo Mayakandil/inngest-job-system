@@ -142,7 +142,7 @@ The heartbeat reports the number of reports currently in the `pending`, `done`, 
 
 The Inngest development dashboard shows background job runs, individual steps, retries, failures, and scheduled heartbeat runs.
 
-![Inngest Dashboard](inngest-job-system/screenshots.png)
+![Inngest Dashboard](screenshots.png)
 ## Notes
 
 Reports are stored in an in-memory Python dictionary for this assignment. Therefore, report data is lost whenever the FastAPI server restarts.
