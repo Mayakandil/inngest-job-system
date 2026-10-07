@@ -57,6 +57,25 @@ async def make_report(ctx:inngest.Context):
     return {"result":result}
 
 
+@inngest_client.create_function(
+    fn_id="heartbeat",
+    trigger=inngest.TriggerCron(cron="* * * * *"),
+)
+async def heartbeat(ctx: inngest.Context):
+
+    pending = sum(1 for r in reports.values() if r["status"] == "pending")
+    done = sum(1 for r in reports.values() if r["status"] == "done")
+    failed = sum(1 for r in reports.values() if r["status"] == "failed")
+
+    print(
+        f"Report summary: pending={pending}, done={done}, failed={failed}"
+    )
+
+    return {
+        "pending": pending,
+        "done": done,
+        "failed": failed,
+    }
 #create fastapi app
 app = FastAPI()
 
@@ -70,9 +89,6 @@ def health():
 async def create_report(request: ReportRequest):
     if not request.topic:
         raise HTTPException (status_code=400, detail="topic is required")
-    
-    
-    
     
     report_id = str(uuid.uuid4())
     reports[report_id] = {"id":report_id , "topic": request.topic, "status":"pending",}
@@ -92,5 +108,5 @@ def get_report(report_id: str):
 
 #connect inngest to FastAPI
 inngest.fast_api.serve(
-    app,inngest_client,[say_hello , make_report],
+    app,inngest_client,[say_hello , make_report , heartbeat],
 )
